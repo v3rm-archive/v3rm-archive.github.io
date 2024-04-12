@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V3rmillion Index Search</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container my-5">
+        <div class="text-center mb-4">
+            <img src="images/logo_v.png" alt="V3rmillion Logo" class="img-fluid max-w-200"
+                onclick="showRemoveBingPrompt();">
+            <p class="text-muted small">This data is sourced from Bing, and the search developer (Stan) are not affiliated
+                with Microsoft.</p>
+        </div>
+        <h1 class="text-center mb-4">V3rmillion Index Search</h1>
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-8">
+                <form action="#" class="form-inline" onsubmit="search(); return false;">
+                    <input type="text" id="searchInput" class="form-control mr-2 w-100" placeholder="Enter keywords...">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+
+            </div>
+        </div>
+        <div class="row justify-content-center mb-4" id="results"></div>
+        <div class="d-flex justify-content-center mt-4" id="pagination">
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="removeBingModal" tabindex="-1" role="dialog" aria-labelledby="removeBingModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="removeBingModalLabel">Remove Bing Watermark</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    By removing the Bing watermark, you acknowledge that Bing and the V3rmillion index search are not
+                    responsible for the content found. Do you want to proceed?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger"
+                        onclick="removeBingWatermark(); $('#removeBingModal').modal('hide');">Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="addBingModal" tabindex="-1" role="dialog" aria-labelledby="addBingModal"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addBingModal">Added back Bing Watermark!</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ,
+                        onclick="refreshPage();">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    You have successfully added the Bing watermark back.
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="loading-spinner" class="d-none text-center my-5">
+        <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+    <script>
+        let currentPage = 1;
+        let totalPages = 1;
+
+        async function bingSearch(query, page = 1) {
+            ogpage = page
+            page = parseInt(page);
+            totalPages = 0;
+            if (page > 1) {
+                page = page * 10;
+            }
+            const url = `https://corsproxy.io/?https://www.bing.com/search?q=${encodeURIComponent(query)}&first=${page}`;
+            console.log(url);
+            const response = await axios.get(url, {});
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(response.data, "text/html");
+            const results = [];
+
+            const bAttributions = htmlDoc.querySelectorAll('.b_attribution');
+            bAttributions.forEach((element) => {
+                const uAttributeValue = element.getAttribute('u');
+                results.push({ "title": null, "cache": uAttributeValue });
+            });
+
+            const bAlgoLinks = htmlDoc.querySelectorAll('.b_algo h2 a');
+            bAlgoLinks.forEach((el, i) => {
+                results[i].title = el.textContent;
+            });
+            const pages = htmlDoc.querySelectorAll('.sb_bp');
+            console.log(pages);
+            pages.forEach((element) => {
+                if (parseInt(element.textContent)) {
+                    totalPages = parseInt(element.textContent);
+                }
+                console.log(totalPages);
+            })
+            results.forEach((result, i) => {
+                if (result.title == null || result.cache == null) {
+                    results.splice(i, 1);
+                }
+                if (result.cache != null) {
+                    let splitCache = result.cache.split("|");
+                    console.log(splitCache[3]);
+                    result.cache = `?d=${splitCache[2]}&w=${splitCache[3]}`;
+                }
+            });
+            return [results, totalPages, ogpage];
+        }
+
+
+
+        async function search(page = 1) {
+            currentPage = page;
+            const query = document.getElementById("searchInput").value;
+            let results = await bingSearch("site:v3rmillion.net " + query, page)
+            console.log(results[1]);
+            displayResults(results[0]);
+            updatePagination(results[2], results[1]);
+        }
+
+        function displayResults(results) {
+            const resultsContainer = document.getElementById("results");
+            const loadingSpinner = document.getElementById("loading-spinner");
+
+            resultsContainer.innerHTML = "";
+            if (results.length === 0) {
+                resultsContainer.innerHTML = "<p class='text-center'>No results found.</p>";
+                return;
+            }
+
+            results.forEach(result => {
+                const resultItem = document.createElement("div");
+                resultItem.classList.add("col-md-6", "mb-4");
+                resultItem.setAttribute("cache-id", result.cache);
+                resultItem.innerHTML = `
+      <div class="card h-100">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">${result.title}</h5>
+          <a href="#" class="btn btn-primary mt-auto view-btn">Click here to view</a>
+        </div>
+      </div>
+    `;
+
+                const viewBtn = resultItem.querySelector(".view-btn");
+                viewBtn.onclick = async function () {
+                    resultsContainer.classList.add("d-none");
+                    loadingSpinner.classList.remove("d-none");
+
+                    try {
+                        const searchParams = new URLSearchParams(window.location.search);
+                        let html = await axios.get(`https://corsproxy.io/?https://cc.bingj.com/cache.aspx${result.cache}`);
+                        let html2 = html.data;
+                        html2 = html2.replace(/type="text\/javascript" src="https:\/\/v3rmillion\.net/g, `type="text/javascript" src="`);
+                        html2 = html2.replace(/src="https:\/\/v3rmillion\.net/g, `src="`);
+                        html2 = html2.replace(/<script>var _0x.*?<\/script>/g, '');
+                        html2 = html2.replace(/rel="stylesheet" href="https:\/\/v3rmillion\.net\//g, 'rel="stylesheet" href="');
+			html2 = html2.replace(/base href="https:\/\/v3rmillion.net\//g, '');
+
+                        if (getCookie('BING_REMOVE_THE_WATERMARK_FOR_LOCALSTORAGE_LOCAL')) {
+                            html2 = html2.replace(/.*b_vPanel.*\n?/g, '');
+                        }
+
+                        document.body.innerHTML = html2;
+                        loadingSpinner.classList.add("d-none");
+                        resultsContainer.classList.remove("d-none");
+                    } catch (error) {
+                        loadingSpinner.classList.add("d-none");
+                        resultsContainer.classList.remove("d-none");
+                    }
+                };
+
+                resultsContainer.appendChild(resultItem);
+            });
+        }
+
+        function updatePagination(page, totalPages) {
+            const paginationContainer = document.getElementById("pagination");
+            paginationContainer.innerHTML = "";
+            totalPages = totalPages || 1;
+
+            const paginationList = document.createElement("ul");
+            paginationList.classList.add("pagination", "justify-content-center");
+
+            const prevPageItem = document.createElement("li");
+            prevPageItem.classList.add("page-item");
+            prevPageItem.classList.toggle("disabled", currentPage === 1);
+            const prevPageLink = document.createElement("a");
+            prevPageLink.classList.add("page-link");
+            prevPageLink.href = "#";
+            prevPageLink.textContent = "Previous";
+            prevPageLink.onclick = () => search(currentPage - 1);
+            prevPageItem.appendChild(prevPageLink);
+            paginationList.appendChild(prevPageItem);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageItem = document.createElement("li");
+                pageItem.classList.add("page-item");
+                pageItem.classList.toggle("active", currentPage === i);
+                const pageLink = document.createElement("a");
+                pageLink.classList.add("page-link");
+                pageLink.href = "#";
+                pageLink.textContent = i;
+                pageLink.onclick = () => search(i);
+                pageItem.appendChild(pageLink);
+                paginationList.appendChild(pageItem);
+            }
+            const nextPageItem = document.createElement("li");
+            nextPageItem.classList.add("page-item");
+            nextPageItem.classList.toggle("disabled", currentPage === totalPages);
+            const nextPageLink = document.createElement("a");
+            nextPageLink.classList.add("page-link");
+            nextPageLink.href = "#";
+            nextPageLink.textContent = "Next";
+            nextPageLink.onclick = () => search(currentPage + 1);
+            nextPageItem.appendChild(nextPageLink);
+            paginationList.appendChild(nextPageItem);
+
+            paginationContainer.appendChild(paginationList);
+
+        }
+
+        function showRemoveBingPrompt() {
+            if (!getCookie('BING_REMOVE_THE_WATERMARK_FOR_LOCALSTORAGE_LOCAL')) {
+                $('#removeBingModal').modal('show');
+            } else {
+                $('#addBingModal').modal('show');
+                localStorage.removeItem("BING_REMOVE_THE_WATERMARK_FOR_LOCALSTORAGE_LOCAL");
+
+            }
+        }
+        function refreshPage() {
+            window.location.reload();
+        }
+        function removeBingWatermark() {
+            setCookie('BING_REMOVE_THE_WATERMARK_FOR_LOCALSTORAGE_LOCAL', 'true');
+        }
+
+        function getCookie(name) {
+            var name = localStorage.getItem(name);
+            console.log(name);
+            return Boolean(name);
+        }
+
+        function setCookie(name, value) {
+            localStorage.setItem(name, value);
+            window.location.reload();
+        }
+    </script>
+</body>
+
+</html>

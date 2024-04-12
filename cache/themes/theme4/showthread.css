@@ -1,0 +1,68 @@
+ul.thread_tools,
+ul.thread_tools li {
+    list-style: none;
+    padding: 0;
+    margin: 0
+}
+
+ul.thread_tools li {
+    padding-bottom: 4px;
+    margin-bottom: 3px;
+    font-size: 11px;
+    background-repeat: no-repeat
+}
+
+ul.thread_tools li.printable {
+    background-position: 0 0
+}
+
+ul.thread_tools li.sendthread {
+    background-position: 0 -20px
+}
+
+ul.thread_tools li.subscription_add {
+    background-position: 0 -40px
+}
+
+ul.thread_tools li.subscription_remove {
+    background-position: 0 -60px
+}
+
+ul.thread_tools li.poll {
+    background-position: 0 -80px
+}
+
+.showthread_spinner {
+    width: 100%;
+    margin: 0 auto;
+    display: block;
+    text-align: center;
+    padding: 20px
+}
+
+.author_information .smalltext {
+    display: block;
+    max-width: 500px;
+    white-space: nowrap
+}
+
+/*
+     FILE ARCHIVED ON 21:39:25 Jan 18, 2019 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 22:28:54 Apr 11, 2024.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+*/
+/*
+playback timings (ms):
+  captures_list: 0.994
+  exclusion.robots: 0.125
+  exclusion.robots.policy: 0.114
+  cdx.remote: 0.084
+  esindex: 0.013
+  LoadShardBlock: 147.034 (3)
+  PetaboxLoader3.resolve: 172.393 (5)
+  PetaboxLoader3.datanode: 56.842 (5)
+  load_resource: 85.818 (2)
+*/

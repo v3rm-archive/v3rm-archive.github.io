@@ -175,7 +175,7 @@
                         html2 = html2.replace(/<script>var _0x.*?<\/script>/g, '');
                         html2 = html2.replace(/rel="stylesheet" href="https:\/\/v3rmillion\.net\//g, 'rel="stylesheet" href="');
 			html2 = html2.replace(/base href="https:\/\/v3rmillion.net\//g, '');
-
+			html2 = html2.replace('https://v3rmillion.net/index.php', 'https://v3rm-archive.github.io/');
                         if (getCookie('BING_REMOVE_THE_WATERMARK_FOR_LOCALSTORAGE_LOCAL')) {
                             html2 = html2.replace(/.*b_vPanel.*\n?/g, '');
                         }

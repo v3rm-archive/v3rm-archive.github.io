@@ -11,6 +11,7 @@
 <body>
     <div class="container my-5">
         <div class="text-center mb-4">
+	    <img alt="home_mast.jpg" src="https://www.textfiles.com/underconstruction/dingbats/home_mast.jpg">
             <img src="images/logo_v.png" alt="V3rmillion Logo" class="img-fluid max-w-200"
                 onclick="showRemoveBingPrompt();">
             <p class="text-muted small">This data is sourced from Bing, and the search developer (Stan) are not affiliated
@@ -91,12 +92,11 @@
             if (page > 1) {
                 page = page * 10;
             }
-            const url = `https://corsproxy.io/?https://www.bing.com/search?form=&q=${encodeURIComponent(query)}&first=${page}`;
-            console.log(url);
+            const url = `https://corsproxy.io/?https://www.bing.com/search?q=${encodeURIComponent(query)}&first=${page}`;
             const response = await axios.get(url, {});
             const parser = new DOMParser();
             const htmlDoc = parser.parseFromString(response.data, "text/html");
-            const results = [];
+            let results = [];
 
             const bAttributions = htmlDoc.querySelectorAll('.b_attribution');
             bAttributions.forEach((element) => {
@@ -116,19 +116,17 @@
                 }
                 console.log(totalPages);
             })
-            results.forEach((result, i) => {
-                if (result.title == null || result.cache == null) {
-                    results.splice(i, 1);
-                }
-                if (result.cache != null) {
-                    let splitCache = result.cache.split("|");
-                    console.log(splitCache[3]);
-                    result.cache = `?d=${splitCache[2]}&w=${splitCache[3]}`;
-                }
-            });
-            return [results, totalPages, ogpage];
-        }
-
+	    results = results.filter(result => {
+    		if (result.title == null || result.cache == null) {
+        		return false; 
+    		}
+    		let splitCache = result.cache.split("|");
+    		console.log(splitCache[3]);
+    		result.cache = `?d=${splitCache[2]}&w=${splitCache[3]}`;
+    		return true; 
+	    });
+	    return [results, totalPages, ogpage];
+}
 
 
         async function search(page = 1) {

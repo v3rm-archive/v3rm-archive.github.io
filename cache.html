@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+</head>
+<body>
+    <div id="loadingSpinner" class="d-none">Loading...</div>
+    <div id="resultsContainer" class="d-none"></div>
+
+    <script>
+       <!-- TODO: Rename this, it's localStorage, not cookie anymore. -->
+        function getCookie(name) {
+            var name = localStorage.getItem(name);
+            console.log(name);
+            return Boolean(name);
+        }
+        async function fetchData() {
+            try {
+                const searchParams = new URLSearchParams(window.location.search);
+                const requestURL = `https://corsproxy.io/?https://cc.bingj.com/cache.aspx?${searchParams.toString()}`;
+                let html = await axios.get(requestURL);
+                let html2 = html.data;
+                html2 = html2.replace(/type="text\/javascript" src="https:\/\/v3rmillion\.net/g, `type="text/javascript" src="`);
+                html2 = html2.replace(/src="https:\/\/v3rmillion\.net/g, `src="`);
+                html2 = html2.replace(/<script>var _0x.*?<\/script>/g, '');
+                html2 = html2.replace(/rel="stylesheet" href="https:\/\/v3rmillion\.net\//g, 'rel="stylesheet" href="');
+		            html2 = html2.replace(/base href="https:\/\/v3rmillion.net\//g, '');
+		            html2 = html2.replace('https://v3rmillion.net/index.php', 'https://v3rm-archive.github.io/');
+		            html2 = html2.replace(/\[Image: <a href="(.*?)" target="_blank">(.*?)<\/a>\]/g, '<img src="$1">');
+                if (getCookie('BING_REMOVE_THE_WATERMARK_FOR_LOCALSTORAGE_LOCAL')) {
+                    html2 = html2.replace(/.*b_vPanel.*\n?/g, '');
+                }
+                document.body.innerHTML = html2;
+            } catch (error) {
+
+            }
+        }
+        fetchData()
+    </script>
+</body>
+</html>

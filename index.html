@@ -91,7 +91,7 @@
             if (page > 1) {
                 page = page * 10;
             }
-            const url = `https://corsproxy.io/?https://www.bing.com/search?q=${encodeURIComponent(query)}&first=${page}`;
+            const url = `https://corsproxy.io/?https://www.bing.com/search?q=${encodeURIComponent(query)}&first=${page}&form=`;
             const response = await axios.get(url, {});
             const parser = new DOMParser();
             const htmlDoc = parser.parseFromString(response.data, "text/html");
@@ -152,12 +152,15 @@
                 resultItem.classList.add("col-md-6", "mb-4");
                 resultItem.setAttribute("cache-id", result.cache);
                 resultItem.innerHTML = `
-      <div class="card h-100">
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title">${result.title}</h5>
-          <a href="#" class="btn btn-primary mt-auto view-btn">Click here to view</a>
-        </div>
-      </div>
+<div class="card h-100">
+  <div class="card-body d-flex flex-column">
+    <h5 class="card-title">${result.title}</h5>
+    <a href="#" class="btn btn-primary mt-auto view-btn">Click here to view</a>
+    <!-- Permalink button -->
+    <a href="cache.html${result.cache}" class="btn btn-link mt-2 permalink-btn"><i class="fas fa-link"></i> Permalink</a>
+  </div>
+</div>
+
     `;
 
                 const viewBtn = resultItem.querySelector(".view-btn");
@@ -175,6 +178,7 @@
                         html2 = html2.replace(/rel="stylesheet" href="https:\/\/v3rmillion\.net\//g, 'rel="stylesheet" href="');
 			html2 = html2.replace(/base href="https:\/\/v3rmillion.net\//g, '');
 			html2 = html2.replace('https://v3rmillion.net/index.php', 'https://v3rm-archive.github.io/');
+			html2 = html2.replace(/\[Image: <a href="(.*?)" target="_blank">(.*?)<\/a>\]/g, '<img src="$1">');
                         if (getCookie('BING_REMOVE_THE_WATERMARK_FOR_LOCALSTORAGE_LOCAL')) {
                             html2 = html2.replace(/.*b_vPanel.*\n?/g, '');
                         }

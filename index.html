@@ -91,7 +91,7 @@
             if (page > 1) {
                 page = page * 10;
             }
-            const url = `https://corsproxy.io/?https://www.bing.com/search?q=${encodeURIComponent(query)}&first=${page}&form=`;
+            const url = `https://corsproxy.io/?https://www.bing.com/search?q=${encodeURIComponent(query)}&first=${page}&form=QBLH`;
             const response = await axios.get(url, {});
             const parser = new DOMParser();
             const htmlDoc = parser.parseFromString(response.data, "text/html");

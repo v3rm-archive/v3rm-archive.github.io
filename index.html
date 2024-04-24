@@ -6,14 +6,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>V3rmillion Index Search</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #content {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container my-5">
+    <div id="loading-screen">
+        <div class="loading-spinner"></div>
+    </div>
+    <div class="container my-5" id="content">
         <div class="text-center mb-4">
             <img src="images/logo_v.png" alt="V3rmillion Logo" class="img-fluid max-w-200"
                 onclick="showRemoveBingPrompt();">
-            <p class="text-muted small">This data is sourced from Bing, and the search developer (Stan) are not affiliated
+            <p class="text-muted small">This data is sourced from Bing, and the search developer (Stan) are not
+                affiliated
                 with Microsoft.</p>
         </div>
         <h1 class="text-center mb-4">V3rmillion Index Search</h1>
@@ -81,9 +122,39 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
     <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            var loadingScreen = document.getElementById('loading-screen');
+            var content = document.getElementById('content');
+            loadingScreen.classList.remove("d-none");
+            loadingScreen.innerHTML = "Getting Bing form code...";
+
+            try {
+                const response = await axios.get('https://corsproxy.io/?https://www.bing.com', {
+                    headers: {
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache',
+                        'Expires': '0',
+                    },
+                });
+
+                const html = await response.data
+                const formCodeMatch = html.match(/"FormCode":"(.*?)"/);
+                const formCode = formCodeMatch ? formCodeMatch[1] : "Unknown";
+                loadingScreen.innerHTML = "FormCode: " + formCode;
+                loadingScreen.style.display = 'none';
+                content.style.display = 'block';
+                sessionStorage.setItem("form", formCode)
+            } catch (error) {
+                loadingScreen.innerHTML = "Error occurred while getting the Bing form code. Report this to the V3rmillion thread";
+            }
+        });
+    </script>
+
+
+    <script>
         let currentPage = 1;
         let totalPages = 1;
-
+        console.log(window.form)
         async function bingSearch(query, page = 1) {
             ogpage = page
             page = parseInt(page);
@@ -91,8 +162,14 @@
             if (page > 1) {
                 page = page * 10;
             }
-            const url = `https://corsproxy.io/?https://www.bing.com/search?q=${encodeURIComponent(query)}&first=${page}&form=QBLH`;
-            const response = await axios.get(url, {});
+            const url = `https://corsproxy.io/?https://www.bing.com/search?q=${encodeURIComponent(query)}&first=${page}&form=${sessionStorage.getItem("form")}`;
+            const response = await axios.get(url, {
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache',
+                    'Expires': '0',
+                },
+            });
             const parser = new DOMParser();
             const htmlDoc = parser.parseFromString(response.data, "text/html");
             let results = [];
@@ -115,17 +192,17 @@
                 }
                 console.log(totalPages);
             })
-	    results = results.filter(result => {
-    		if (result.title == null || result.cache == null) {
-        		return false; 
-    		}
-    		let splitCache = result.cache.split("|");
-    		console.log(splitCache[3]);
-    		result.cache = `?d=${splitCache[2]}&w=${splitCache[3]}`;
-    		return true; 
-	    });
-	    return [results, totalPages, ogpage];
-}
+            results = results.filter(result => {
+                if (result.title == null || result.cache == null) {
+                    return false;
+                }
+                let splitCache = result.cache.split("|");
+                console.log(splitCache[3]);
+                result.cache = `?d=${splitCache[2]}&w=${splitCache[3]}`;
+                return true;
+            });
+            return [results, totalPages, ogpage];
+        }
 
 
         async function search(page = 1) {
@@ -176,9 +253,9 @@
                         html2 = html2.replace(/src="https:\/\/v3rmillion\.net/g, `src="`);
                         html2 = html2.replace(/<script>var _0x.*?<\/script>/g, '');
                         html2 = html2.replace(/rel="stylesheet" href="https:\/\/v3rmillion\.net\//g, 'rel="stylesheet" href="');
-			html2 = html2.replace(/base href="https:\/\/v3rmillion.net\//g, '');
-			html2 = html2.replace('https://v3rmillion.net/index.php', 'https://v3rm-archive.github.io/');
-			html2 = html2.replace(/\[Image: <a href="(.*?)" target="_blank">(.*?)<\/a>\]/g, '<img src="$1">');
+                        html2 = html2.replace(/base href="https:\/\/v3rmillion.net\//g, '');
+                        html2 = html2.replace('https://v3rmillion.net/index.php', 'https://v3rm-archive.github.io/');
+                        html2 = html2.replace(/\[Image: <a href="(.*?)" target="_blank">(.*?)<\/a>\]/g, '<img src="$1">');
                         if (getCookie('BING_REMOVE_THE_WATERMARK_FOR_LOCALSTORAGE_LOCAL')) {
                             html2 = html2.replace(/.*b_vPanel.*\n?/g, '');
                         }
@@ -268,6 +345,7 @@
             localStorage.setItem(name, value);
             window.location.reload();
         }
+
     </script>
 </body>
 

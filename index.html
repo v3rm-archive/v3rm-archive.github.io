@@ -55,7 +55,11 @@
                 onclick="showRemoveBingPrompt();">
             <p class="text-muted small">This data is sourced from Bing, and the search developer (Stan) are not
                 affiliated
-                with Microsoft.</p>
+                with Microsoft.
+            </p>
+            <p class="text-muted small" id="okayformcode">Form code: NOT FOUND, if any search-related issues pop up,
+                screenshot this page
+                and send it on V3rm.</p>
         </div>
         <h1 class="text-center mb-4">V3rmillion Index Search</h1>
         <div class="row justify-content-center mb-4">
@@ -125,6 +129,7 @@
         document.addEventListener("DOMContentLoaded", async function () {
             var loadingScreen = document.getElementById('loading-screen');
             var content = document.getElementById('content');
+            var formCodeElement = document.getElementById("okayformcode")
             loadingScreen.classList.remove("d-none");
             loadingScreen.innerHTML = "Getting Bing form code...";
 
@@ -140,12 +145,20 @@
                 const html = await response.data
                 const formCodeMatch = html.match(/"FormCode":"(.*?)"/);
                 const formCode = formCodeMatch ? formCodeMatch[1] : "Unknown";
-                loadingScreen.innerHTML = "FormCode: " + formCode;
-                loadingScreen.style.display = 'none';
-                content.style.display = 'block';
+                console.log(formCode)
                 sessionStorage.setItem("form", formCode)
+                if (formCode == "Unknown") {
+                    sessionStorage.setItem("form", " ")
+                } else {
+                    formCodeElement.innerHTML = "Form Code: " + formCode
+                    content.style.display = 'block';
+                    loadingScreen.style.display = 'none';
+                }
             } catch (error) {
-                loadingScreen.innerHTML = "Error occurred while getting the Bing form code. Report this to the V3rmillion thread";
+                sessionStorage.setItem("form", " ")
+                formCodeElement.innerHTML = "Form Code: ERRORED"
+                content.style.display = 'block';
+                loadingScreen.style.display = 'none';
             }
         });
     </script>
@@ -159,6 +172,13 @@
             ogpage = page
             page = parseInt(page);
             totalPages = 0;
+            encodedpage = btoa(query)
+            sessionPageCached = sessionStorage.getItem(encodedpage.concat("_", page.toString()))
+            console.log(page)
+            console.log(query)
+            if (sessionPageCached) {
+                return JSON.parse(sessionPageCached)
+            }
             if (page > 1) {
                 page = page * 10;
             }
@@ -201,6 +221,7 @@
                 result.cache = `?d=${splitCache[2]}&w=${splitCache[3]}`;
                 return true;
             });
+            sessionStorage.setItem(encodedpage.concat("_", String(page)), JSON.stringify([results, totalPages, ogpage]))
             return [results, totalPages, ogpage];
         }
 
@@ -346,6 +367,11 @@
             window.location.reload();
         }
 
+    </script>
+    <script>
+        window.addEventListener("beforeunload", function (e) {
+            sessionStorage.clear()
+        }); 
     </script>
 </body>
 

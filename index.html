@@ -173,7 +173,7 @@
             page = parseInt(page);
             totalPages = 0;
             encodedpage = btoa(query)
-            sessionPageCached = sessionStorage.getItem(encodedpage.concat("_", page.toString()))
+            sessionPageCached = sessionStorage.getItem(`${encodedpage}_${ogpage}`);
             console.log(page)
             console.log(query)
             if (sessionPageCached) {
@@ -221,7 +221,7 @@
                 result.cache = `?d=${splitCache[2]}&w=${splitCache[3]}`;
                 return true;
             });
-            sessionStorage.setItem(encodedpage.concat("_", String(page)), JSON.stringify([results, totalPages, ogpage]))
+            sessionStorage.setItem(`${encodedpage}_${ogpage}`, JSON.stringify([results, totalPages, ogpage]))
             return [results, totalPages, ogpage];
         }
 

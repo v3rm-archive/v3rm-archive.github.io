@@ -267,8 +267,9 @@
                     loadingSpinner.classList.remove("d-none");
 
                     try {
-                        const searchParams = new URLSearchParams(window.location.search);
-                        let html = await axios.get(`https://vercel-cors-proxy-nine.vercel.app/api/index?url=https://cc.bingj.com/cache.aspx${result.cache}`);
+                        const url = encodeURIComponent("https://cc.bingj.com/cache.aspx?" + result.cache)
+                        const requestURL = `https://vercel-cors-proxy-nine.vercel.app/api/index?url=${url}`;
+                        let html = await axios.get(requestURL);
                         let html2 = html.data;
                         html2 = html2.replace(/type="text\/javascript" src="https:\/\/v3rmillion\.net/g, `type="text/javascript" src="`);
                         html2 = html2.replace(/src="https:\/\/v3rmillion\.net/g, `src="`);
@@ -277,6 +278,10 @@
                         html2 = html2.replace(/base href="https:\/\/v3rmillion.net\//g, '');
                         html2 = html2.replace('https://v3rmillion.net/index.php', 'https://v3rm-archive.github.io/');
                         html2 = html2.replace(/\[Image: <a href="(.*?)" target="_blank">(.*?)<\/a>\]/g, '<img src="$1">');
+                        if (getCookie('BING_REMOVE_THE_WATERMARK_FOR_LOCALSTORAGE_LOCAL')) {
+                                html2 = html2.replace(/.*b_vPanel.*\n?/g, '');
+                        }
+                        document.body.innerHTML = html2;
                         if (getCookie('BING_REMOVE_THE_WATERMARK_FOR_LOCALSTORAGE_LOCAL')) {
                             html2 = html2.replace(/.*b_vPanel.*\n?/g, '');
                         }

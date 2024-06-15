@@ -143,7 +143,6 @@
                 const response = await axios.get('https://vercel-cors-proxy-nine.vercel.app/api/index?url=https://www.bing.com', {
                     headers: {
                         'Cache-Control': 'no-cache',
-                        'Pragma': 'no-cache',
                         'Expires': '0',
                     },
                 });
@@ -192,7 +191,6 @@
             const response = await axios.get(url, {
                 headers: {
                     'Cache-Control': 'no-cache',
-                    'Pragma': 'no-cache',
                     'Expires': '0',
                 },
             });

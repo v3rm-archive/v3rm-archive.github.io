@@ -19,7 +19,8 @@
         async function fetchData() {
             try {
                 const searchParams = new URLSearchParams(window.location.search);
-                const requestURL = `https://vercel-cors-proxy-nine.vercel.app/api/index?url=https://cc.bingj.com/cache.aspx?${searchParams.toString()}`;
+                const url = encodeURIComponent("https://cc.bingj.com/cache.aspx?" + searchParams.toString())
+                const requestURL = `https://vercel-cors-proxy-nine.vercel.app/api/index?url=${url}`;
                 let html = await axios.get(requestURL);
                 let html2 = html.data;
                 html2 = html2.replace(/type="text\/javascript" src="https:\/\/v3rmillion\.net/g, `type="text/javascript" src="`);

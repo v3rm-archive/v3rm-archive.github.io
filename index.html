@@ -142,8 +142,6 @@
             try {
                 const response = await axios.get('https://vercel-cors-proxy-nine.vercel.app/api/index?url=https://www.bing.com', {
                     headers: {
-                        'Cache-Control': 'no-cache',
-                        'Expires': '0',
                     },
                 });
 
@@ -190,8 +188,6 @@
             const url = `https://vercel-cors-proxy-nine.vercel.app/api/index?url=https://www.bing.com/search?q=${encodeURIComponent(query)}&first=${page}&form=${sessionStorage.getItem("form")}`;
             const response = await axios.get(url, {
                 headers: {
-                    'Cache-Control': 'no-cache',
-                    'Expires': '0',
                 },
             });
             const parser = new DOMParser();

@@ -139,9 +139,8 @@
             var formCodeElement = document.getElementById("okayformcode")
             loadingScreen.classList.remove("d-none");
             loadingScreen.innerHTML = "Getting Bing form code...";
-
             try {
-                const response = await axios.get('https://corsproxy.io/?https://www.bing.com', {
+                const response = await axios.get('https://vercel-cors-proxy-nine.vercel.app/api/index?url=https://www.bing.com', {
                     headers: {
                         'Cache-Control': 'no-cache',
                         'Pragma': 'no-cache',
@@ -189,7 +188,7 @@
             if (page > 1) {
                 page = page * 10;
             }
-            const url = `https://corsproxy.io/?https://www.bing.com/search?q=${encodeURIComponent(query)}&first=${page}&form=${sessionStorage.getItem("form")}`;
+            const url = `https://vercel-cors-proxy-nine.vercel.app/api/index?url=https://www.bing.com/search?q=${encodeURIComponent(query)}&first=${page}&form=${sessionStorage.getItem("form")}`;
             const response = await axios.get(url, {
                 headers: {
                     'Cache-Control': 'no-cache',
@@ -275,7 +274,7 @@
 
                     try {
                         const searchParams = new URLSearchParams(window.location.search);
-                        let html = await axios.get(`https://corsproxy.io/?https://cc.bingj.com/cache.aspx${result.cache}`);
+                        let html = await axios.get(`https://vercel-cors-proxy-nine.vercel.app/api/index?url=https://cc.bingj.com/cache.aspx${result.cache}`);
                         let html2 = html.data;
                         html2 = html2.replace(/type="text\/javascript" src="https:\/\/v3rmillion\.net/g, `type="text/javascript" src="`);
                         html2 = html2.replace(/src="https:\/\/v3rmillion\.net/g, `src="`);

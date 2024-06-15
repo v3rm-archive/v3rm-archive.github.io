@@ -267,7 +267,7 @@
                     loadingSpinner.classList.remove("d-none");
 
                     try {
-                        const url = encodeURIComponent("https://cc.bingj.com/cache.aspx?" + result.cache)
+                        const url = encodeURIComponent("https://cc.bingj.com/cache.aspx" + result.cache)
                         const requestURL = `https://vercel-cors-proxy-nine.vercel.app/api/index?url=${url}`;
                         let html = await axios.get(requestURL);
                         let html2 = html.data;

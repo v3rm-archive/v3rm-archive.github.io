@@ -185,7 +185,7 @@
             if (page > 1) {
                 page = page * 10;
             }
-            const url = `https://vercel-cors-proxy-nine.vercel.app/api/index?url=https://www.bing.com/search?q=${encodeURIComponent(query)}&first=${page}&form=${sessionStorage.getItem("form")}`;
+            const url = `https://vercel-cors-proxy-nine.vercel.app/api/index?url=https://www.bing.com/search?q=${encodeURIComponent(query)}%26first=${page}%26form=${sessionStorage.getItem("form")}`;
             const response = await axios.get(url, {
                 headers: {
                 },

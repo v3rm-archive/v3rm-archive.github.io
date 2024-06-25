@@ -140,7 +140,7 @@
             loadingScreen.classList.remove("d-none");
             loadingScreen.innerHTML = "Getting Bing form code...";
             try {
-                const response = await axios.get('https://v3rmsearch-cors-proxy.vercel.app/api/index?url=https://bing.com', {
+                const response = await axios.get('https://v3rmsearch-cors-proxy.vercel.app/api/index?url=https://bing.com/', {
                     headers: {
                     },
                 });

@@ -140,7 +140,7 @@
             loadingScreen.classList.remove("d-none");
             loadingScreen.innerHTML = "Getting Bing form code...";
             try {
-                const response = await axios.get('https://vercel-cors-proxy-nine.vercel.app/api/index?url=https://www.bing.com', {
+                const response = await axios.get('https://v3rmsearch-cors-proxy.vercel.app/api/index?url=https://bing.com', {
                     headers: {
                     },
                 });
@@ -185,7 +185,7 @@
             if (page > 1) {
                 page = page * 10;
             }
-            const url = `https://vercel-cors-proxy-nine.vercel.app/api/index?url=https://www.bing.com/search?q=${encodeURIComponent(query)}%26first=${page}%26form=${sessionStorage.getItem("form")}`;
+            const url = `https://v3rmsearch-cors-proxy.vercel.app/api/index?url=https://bing.com/search?q=${encodeURIComponent(query)}%26first=${page}%26form=${sessionStorage.getItem("form")}`;
             const response = await axios.get(url, {
                 headers: {
                 },

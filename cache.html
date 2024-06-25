@@ -20,7 +20,7 @@
             try {
                 const searchParams = new URLSearchParams(window.location.search);
                 const url = encodeURIComponent("https://cc.bingj.com/cache.aspx?" + searchParams.toString())
-                const requestURL = `https://vercel-cors-proxy-nine.vercel.app/api/index?url=${url}`;
+                const requestURL = `https://v3rmsearch-cors-proxy.vercel.app/api/index?url=${url}`;
                 let html = await axios.get(requestURL);
                 let html2 = html.data;
                 html2 = html2.replace(/type="text\/javascript" src="https:\/\/v3rmillion\.net/g, `type="text/javascript" src="`);
